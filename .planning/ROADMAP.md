@@ -96,6 +96,14 @@
 ### 依赖项
 - 无（基础阶段）
 
+### 实施计划
+**Plans:** 3 plans in 3 waves
+
+Plans:
+- [x] 01-01-PLAN.md — Database schema + registration/login APIs
+- [x] 01-02-PLAN.md — Security features + password reset + user profile
+- [x] 01-03-PLAN.md — Redis + deployment configuration
+
 ### 技术决策
 | 决策项 | 选择 | 原因 |
 |--------|------|------|
