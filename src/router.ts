@@ -1,6 +1,17 @@
-// @routes-hash 3cfad40b3c8658b442ab766a9323d740
-import { Express } from "express";
+// @routes-hash 8f7c2d1a4e5b6c3d7e8f9a0b1c2d3e4f
+import { Express, Router } from "express";
 
+import routeAuthRegister from "./routes/auth/register.post";
+import routeAuthLogin from "./routes/auth/login.post";
+import routeAuthRefresh from "./routes/auth/refresh.post";
+import routeAuthLogout from "./routes/auth/logout.post";
+import routeAuthForgotPassword from "./routes/auth/forgot-password.post";
+import routeAuthResetPassword from "./routes/auth/reset-password.post";
+import routeUserProfileGet from "./routes/user/profile.get";
+import routeUserProfilePut from "./routes/user/profile.put";
+
+// Rate limiting middleware
+import { authLimiter } from "./middleware/rate-limit";
 import route1 from "./routes/assets/addAssets";
 import route2 from "./routes/assets/delAssets";
 import route3 from "./routes/assets/generateAssets";
@@ -157,4 +168,18 @@ export default async (app: Express) => {
   app.use("/video/reviseVideoStoryboards", route75);
   app.use("/video/saveVideo", route76);
   app.use("/video/upDateVideoConfig", route77);
+
+  // Auth routes with rate limiting
+  app.use("/auth/register", routeAuthRegister);
+  app.use("/auth/login", authLimiter, routeAuthLogin);
+  app.use("/auth/refresh", routeAuthRefresh);
+  app.use("/auth/logout", routeAuthLogout);
+  app.use("/auth/forgot-password", routeAuthForgotPassword);
+  app.use("/auth/reset-password", routeAuthResetPassword);
+
+  // User routes - combine GET and PUT handlers
+  const userProfileRouter = Router();
+  userProfileRouter.use(routeUserProfileGet);
+  userProfileRouter.use(routeUserProfilePut);
+  app.use("/user/profile", userProfileRouter);
 }
