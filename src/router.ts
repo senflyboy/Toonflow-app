@@ -7,8 +7,10 @@ import routeAuthRefresh from "./routes/auth/refresh.post";
 import routeAuthLogout from "./routes/auth/logout.post";
 import routeAuthForgotPassword from "./routes/auth/forgot-password.post";
 import routeAuthResetPassword from "./routes/auth/reset-password.post";
+import routeAuthVerifyEmail from "./routes/auth/verify-email.post";
 import routeUserProfileGet from "./routes/user/profile.get";
 import routeUserProfilePut from "./routes/user/profile.put";
+import routeUserAvatar from "./routes/user/avatar.put";
 
 // Rate limiting middleware
 import { authLimiter } from "./middleware/rate-limit";
@@ -176,10 +178,14 @@ export default async (app: Express) => {
   app.use("/auth/logout", routeAuthLogout);
   app.use("/auth/forgot-password", routeAuthForgotPassword);
   app.use("/auth/reset-password", routeAuthResetPassword);
+  app.use("/auth/verify-email", routeAuthVerifyEmail);
 
   // User routes - combine GET and PUT handlers
   const userProfileRouter = Router();
   userProfileRouter.use(routeUserProfileGet);
   userProfileRouter.use(routeUserProfilePut);
   app.use("/user/profile", userProfileRouter);
+
+  // Avatar upload route
+  app.use("/user/avatar", routeUserAvatar);
 }

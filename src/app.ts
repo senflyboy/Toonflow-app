@@ -11,10 +11,17 @@ import path from "path";
 import u from "@/utils";
 import jwt from "jsonwebtoken";
 
+// Check if running in Vercel serverless environment
+const isVercel = process.env.VERCEL === "1" || process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined;
+
 const app = express();
 let server: ReturnType<typeof app.listen> | null = null;
 
-export default async function startServe() {
+// For Vercel serverless - export app directly
+export default app;
+
+// Initialize Express app
+async function initializeApp() {
   if (process.env.NODE_ENV == "dev") await buildRoute();
 
   expressWs(app);
@@ -26,8 +33,8 @@ export default async function startServe() {
 
   let rootDir: string;
   if (typeof process.versions?.electron !== "undefined") {
-    const { app } = require("electron");
-    const userDataDir: string = app.getPath("userData");
+    const { app: electronApp } = require("electron");
+    const userDataDir: string = electronApp.getPath("userData");
     rootDir = path.join(userDataDir, "uploads");
   } else {
     rootDir = path.join(process.cwd(), "uploads");
@@ -76,6 +83,16 @@ export default async function startServe() {
     console.error(err);
     res.status(err.status || 500).send(err);
   });
+}
+
+export async function startServe() {
+  await initializeApp();
+
+  // Skip server listen in serverless environments (Vercel, AWS Lambda)
+  if (isVercel) {
+    console.log("Running in Vercel serverless mode");
+    return;
+  }
 
   const port = parseInt(process.env.PORT || "60000");
   server = app.listen(port, async () => {
