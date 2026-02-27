@@ -5,6 +5,7 @@ import { getPgDb } from "@/utils/dbPostgres";
 import { hashToken } from "@/utils/password";
 import { success, error } from "@/lib/responseFormat";
 import { createAuditLog, AuditActions } from "@/services/audit";
+import { isTokenBlacklisted } from "@/services/redis";
 
 const router = express.Router();
 
@@ -61,6 +62,18 @@ router.post("/", async (req, res) => {
 
     // Hash the provided refresh token and look up in database
     const tokenHash = hashToken(refreshToken);
+
+    // Check if token is blacklisted in Redis
+    try {
+      const isBlacklisted = await isTokenBlacklisted(tokenHash);
+      if (isBlacklisted) {
+        return res.status(401).send(error("Token has been revoked"));
+      }
+    } catch (redisErr) {
+      console.error("Redis blacklist check failed:", redisErr);
+      // Continue with DB check if Redis fails
+    }
+
     const storedToken = await db("refresh_tokens")
       .where("user_id", userId)
       .where("token_hash", tokenHash)

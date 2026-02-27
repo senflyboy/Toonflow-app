@@ -5,6 +5,7 @@ import { hashToken } from "@/utils/password";
 import { success, error } from "@/lib/responseFormat";
 import { createAuditLog, AuditActions } from "@/services/audit";
 import { authenticate } from "@/middleware/auth";
+import { blacklistToken, getTokenTTL } from "@/services/redis";
 
 const router = express.Router();
 
@@ -35,6 +36,18 @@ router.post("/", authenticate, async (req, res) => {
         .where("user_id", userId)
         .where("token_hash", tokenHash)
         .del();
+
+      // Blacklist the token in Redis (use hashed token for security)
+      try {
+        const ttl = await getTokenTTL(tokenHash);
+        // If token has remaining validity, blacklist it for that duration
+        // Otherwise, default to 7 days
+        const blacklistTTL = ttl > 0 ? ttl : 7 * 24 * 60 * 60;
+        await blacklistToken(tokenHash, blacklistTTL);
+      } catch (redisErr) {
+        console.error("Failed to blacklist token in Redis:", redisErr);
+        // Continue even if Redis fails - DB deletion is the primary action
+      }
 
       // Create audit log
       await createAuditLog(

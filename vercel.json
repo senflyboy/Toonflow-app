@@ -1,0 +1,25 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "builds": [
+    {
+      "src": "src/app.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/src/app.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/src/app.ts"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "framework": null,
+  "installCommand": "yarn install",
+  "buildCommand": "yarn build"
+}

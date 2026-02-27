@@ -73,8 +73,10 @@ export const AuditActions = {
   PASSWORD_RESET_COMPLETED: "password_reset_completed",
   PASSWORD_CHANGED: "password_changed",
   EMAIL_CHANGED: "email_changed",
+  EMAIL_VERIFIED: "email_verified",
   PHONE_CHANGED: "phone_changed",
   PROFILE_UPDATED: "profile_updated",
+  AVATAR_UPDATED: "avatar_updated",
   TOKEN_REFRESHED: "token_refreshed",
   TOKEN_REVOKED: "token_revoked",
 } as const;

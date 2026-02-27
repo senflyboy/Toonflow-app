@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getPgDb } from "@/utils/dbPostgres";
 import { hashPassword, passwordSchema, emailSchema, phoneSchema, hashToken } from "@/utils/password";
 import { success, error } from "@/lib/responseFormat";
+import { v4 as uuidv4 } from "uuid";
 
 const router = express.Router();
 
@@ -58,6 +59,24 @@ router.post("/email", async (req, res) => {
         email_verified: false,
       })
       .returning(["id", "email", "username", "created_at"]);
+
+    // Generate email verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+    await db("sms_codes").insert({
+      id: uuidv4(),
+      phone: email, // Use email as identifier
+      code: verificationCode,
+      purpose: "verify_email",
+      expires_at: expiresAt,
+      used: false,
+    });
+
+    // In development, log the verification code
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[DEV] Email verification code for ${email}: ${verificationCode}`);
+    }
 
     // Create audit log
     await db("audit_logs").insert({
