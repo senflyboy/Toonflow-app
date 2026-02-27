@@ -97,7 +97,7 @@
 - 无（基础阶段）
 
 ### 实施计划
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 - [x] 01-01-PLAN.md — Database schema + registration/login APIs
@@ -644,7 +644,7 @@ Plans:
 
 | 角色 | Phase 1-2 | Phase 3-4 | Phase 5-6 |
 |------|-----------|-----------|-----------|
-| 后端开发 | 2 人 | 2 人 | 1 人 | 1/3 | In Progress|  | 1 人 | 2 人 |
+| 后端开发 | 2 人 | 2 人 | 1 人 | 2/3 | In Progress|  | 1 人 | 2 人 |
 | 移动/桌面 | 0 人 | 1 人 | 1 人 |
 | UI/UX 设计 | 0 人 | 0 人 | 1 人 |
 | 测试 | 1 人 | 1 人 | 1 人 |
