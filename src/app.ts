@@ -14,14 +14,23 @@ import jwt from "jsonwebtoken";
 // Check if running in Vercel serverless environment
 const isVercel = process.env.VERCEL === "1" || process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined;
 
-const app = express();
+let app: express.Application;
 let server: ReturnType<typeof app.listen> | null = null;
+let appInitialized = false;
 
-// For Vercel serverless - export app directly
-export default app;
+// For Vercel serverless - export initialization handler
+export default async function handler(req: express.Request, res: express.Response) {
+  if (!appInitialized) {
+    await initializeApp();
+    appInitialized = true;
+  }
+  return app(req, res);
+}
 
 // Initialize Express app
-async function initializeApp() {
+async function initializeApp(): Promise<express.Application> {
+  app = express();
+
   if (process.env.NODE_ENV == "dev") await buildRoute();
 
   expressWs(app);
@@ -118,4 +127,9 @@ export function closeServe(): Promise<void> {
 }
 
 const isElectron = typeof process.versions?.electron !== "undefined";
-if (!isElectron) startServe();
+const isServerless = isVercel || process.env.LANGCHAIN_PROJECT !== undefined;
+
+// Only start server in non-serverless, non-Electron environments
+if (!isElectron && !isServerless) {
+  startServe();
+}
