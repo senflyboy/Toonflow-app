@@ -17,7 +17,10 @@
       "Bash(yarn lint:*)",
       "Bash(npx tsc:*)",
       "Bash(yarn list:*)",
-      "Bash(yarn build:*)"
+      "Bash(yarn build:*)",
+      "Skill(gsd:progress)",
+      "Skill(gsd:discuss-phase)",
+      "Skill(smart-commit)"
     ]
   }
 }
